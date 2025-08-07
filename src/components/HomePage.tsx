@@ -59,7 +59,7 @@ const HomePage = () => {
             </div>
             <div className="md:w-1/2">
               <img 
-                src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixid=M3w3MjUzNDh8MHwxfHNlYXJjaHwyfHxoZWFsdGhjYXJlJTIwcGVyc29uYWxpemVkJTIwdHJlYXRtZW50JTIwbWVkaWNhbCUyMHJlc2VhcmNofGVufDB8fHx8MTc0NDY1Njc0MXww&ixlib=rb-4.0.3" 
+                src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixid=M3w3MjUzNDh8MHwxfHNlYXJjaHw0fHxoZWFsdGhjYXJlJTIwcGVyc29uYWxpemVkJTIwdHJlYXRtZW50JTIwbWVkaWNhbCUyMHRlY2hub2xvZ3l8ZW58MHx8fHwxNzQ0NzAwNjQyfDA&ixlib=rb-4.0.3&fit=fillmax&h=600&w=800" 
                 alt="Brain model representing personalized treatment approach" 
                 className="rounded-lg shadow-lg w-full h-auto"
               />
@@ -69,46 +69,23 @@ const HomePage = () => {
       </section>
       
       <section className="py-16 bg-blue-800 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="md:flex md:items-center md:justify-between">
-            <div className="md:w-2/3 mb-8 md:mb-0">
-              <h2 className="text-3xl font-bold mb-6">Try Our Interactive Tools</h2>
-              <p className="text-xl mb-6">
-                Explore our AI-powered tools to learn more about personalized treatment approaches and get answers to your questions.
-              </p>
-              <Link to="/tools" className="bg-white text-blue-800 hover:bg-gray-100 font-semibold py-3 px-6 rounded-md transition-colors inline-flex items-center">
-                Explore Tools <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </div>
-            <div className="md:w-1/3 flex justify-center">
-              <img 
-                src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixid=M3w3MjUzNDh8MHwxfHNlYXJjaHwxfHxhaSUyMGFzc2lzdGFudCUyMGNoYXRib3QlMjBpY29ufGVufDB8fHx8MTc0NDY5NTI4NXww&ixlib=rb-4.0.3&fit=fillmax&h=200&w=200" 
-                alt="AI Assistant" 
-                className="h-32 w-32 rounded-full border-4 border-white shadow-lg" 
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="section-heading">Ready to Transform Treatment Implementation?</h2>
+          <h2 className="text-3xl font-bold mb-6">Ready to Transform Treatment Implementation?</h2>
           <p className="text-xl mb-8 max-w-3xl mx-auto">
             Join healthcare providers and researchers already using the Leapfrog Design to deliver personalized, effective treatments.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link to="/contact" className="btn-primary">
+            <Link to="/contact" className="bg-white text-blue-800 hover:bg-gray-100 font-semibold py-3 px-6 rounded-md transition-colors">
               Contact Our Team
             </Link>
-            <Link to="/cases" className="btn-secondary">
+            <Link to="/cases" className="border border-white text-white hover:bg-blue-700 font-semibold py-3 px-6 rounded-md transition-colors">
               View Case Studies
             </Link>
           </div>
         </div>
       </section>
       
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="section-heading">Latest Publications</h2>

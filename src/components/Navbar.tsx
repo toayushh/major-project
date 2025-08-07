@@ -1,108 +1,174 @@
-import  { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { Activity, Menu, X, ChevronDown } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { User, Settings, LogOut } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Navbar as ResizableNavbar, NavBody, NavItems, MobileNav, MobileNavToggle } from '@/components/ui/navbar/resizable-navbar';
+import { cn } from '@/lib/utils';
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [userInitials, setUserInitials] = useState('');
+  const [scrolled, setScrolled] = useState(false);
 
-  const toggleMenu = () => setIsOpen(!isOpen);
-  const toggleDropdown = () => setShowDropdown(!showDropdown);
+  // Navigation items
+  const navItems = [
+    { name: 'Home', link: '/' },
+    { name: 'Methodology', link: '/methodology' },
+    { name: 'About', link: '/about' },
+    { name: 'Contact', link: '/contact' },
+    { name: 'Login', link: '/login' },
+    { name: 'Sign Up', link: '/signup' },
+  ];
+
+  // Set user initials
+  useEffect(() => {
+    if (user?.email) {
+      const name = user.user_metadata?.full_name || user.email.split('@')[0];
+      const initials = name
+        .split(' ')
+        .map((n: string) => n[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2);
+      setUserInitials(initials);
+    }
+  }, [user]);
+
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+      setIsMobileMenuOpen(false);
+    } catch (error) {
+      console.error('Failed to log out', error);
+    }
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   return (
-    <nav className="bg-white shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <NavLink to="/" className="flex items-center space-x-2">
-              <Activity className="h-8 w-8 text-blue-600" />
-              <span className="font-bold text-xl text-blue-800">Leapfrog</span>
-            </NavLink>
-          </div>
-          
-          <div className="hidden md:flex items-center space-x-8">
-            <NavLink to="/" className={({isActive}) => isActive ? "text-blue-600 font-medium" : "text-gray-600 hover:text-blue-600"}>Home</NavLink>
-            <NavLink to="/about" className={({isActive}) => isActive ? "text-blue-600 font-medium" : "text-gray-600 hover:text-blue-600"}>About</NavLink>
-            <NavLink to="/methodology" className={({isActive}) => isActive ? "text-blue-600 font-medium" : "text-gray-600 hover:text-blue-600"}>Methodology</NavLink>
-            <NavLink to="/cases" className={({isActive}) => isActive ? "text-blue-600 font-medium" : "text-gray-600 hover:text-blue-600"}>Case Studies</NavLink>
-            <NavLink to="/tools" className={({isActive}) => isActive ? "text-blue-600 font-medium" : "text-gray-600 hover:text-blue-600"}>Interactive Tools</NavLink>
-            <NavLink to="/contact" className={({isActive}) => isActive ? "text-blue-600 font-medium" : "text-gray-600 hover:text-blue-600"}>Contact</NavLink>
-            
-            <div className="relative">
-              <button 
-                onClick={toggleDropdown}
-                className="flex items-center text-gray-600 hover:text-blue-600"
-              >
-                <span>Dashboards</span>
-                <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
-              </button>
-              
-              {showDropdown && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-                  <Link 
-                    to="/patient-dashboard" 
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={() => setShowDropdown(false)}
-                  >
-                    Patient Dashboard
-                  </Link>
-                  <Link 
-                    to="/admin-dashboard" 
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={() => setShowDropdown(false)}
-                  >
-                    Admin Dashboard
-                  </Link>
-                  <Link 
-                    to="/analytics" 
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={() => setShowDropdown(false)}
-                  >
-                    Analytics
-                  </Link>
-                  <Link 
-                    to="/treatment-generator" 
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={() => setShowDropdown(false)}
-                  >
-                    Treatment Generator
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          <div className="md:hidden flex items-center">
-            <button onClick={toggleMenu} className="text-gray-600 hover:text-blue-600">
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
+    <ResizableNavbar className={cn(
+      'fixed top-0 left-0 right-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-sm transition-all duration-200',
+      scrolled ? 'shadow-sm' : ''
+    )}>
+      <NavBody>
+        {/* Logo */}
+        <Link to="/" className="flex items-center space-x-2">
+          <span className="text-xl font-bold text-gray-900">Leapfrog</span>
+        </Link>
+
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center space-x-1">
+          <NavItems 
+            items={navItems}
+            onItemClick={closeMobileMenu}
+            className="flex space-x-1"
+          />
         </div>
-      </div>
-      
-      {isOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 bg-white">
-            <NavLink to="/" className={({isActive}) => isActive ? "block px-3 py-2 rounded-md text-blue-600 font-medium" : "block px-3 py-2 rounded-md text-gray-600 hover:bg-gray-50 hover:text-blue-600"} onClick={toggleMenu}>Home</NavLink>
-            <NavLink to="/about" className={({isActive}) => isActive ? "block px-3 py-2 rounded-md text-blue-600 font-medium" : "block px-3 py-2 rounded-md text-gray-600 hover:bg-gray-50 hover:text-blue-600"} onClick={toggleMenu}>About</NavLink>
-            <NavLink to="/methodology" className={({isActive}) => isActive ? "block px-3 py-2 rounded-md text-blue-600 font-medium" : "block px-3 py-2 rounded-md text-gray-600 hover:bg-gray-50 hover:text-blue-600"} onClick={toggleMenu}>Methodology</NavLink>
-            <NavLink to="/cases" className={({isActive}) => isActive ? "block px-3 py-2 rounded-md text-blue-600 font-medium" : "block px-3 py-2 rounded-md text-gray-600 hover:bg-gray-50 hover:text-blue-600"} onClick={toggleMenu}>Case Studies</NavLink>
-            <NavLink to="/tools" className={({isActive}) => isActive ? "block px-3 py-2 rounded-md text-blue-600 font-medium" : "block px-3 py-2 rounded-md text-gray-600 hover:bg-gray-50 hover:text-blue-600"} onClick={toggleMenu}>Interactive Tools</NavLink>
-            <NavLink to="/contact" className={({isActive}) => isActive ? "block px-3 py-2 rounded-md text-blue-600 font-medium" : "block px-3 py-2 rounded-md text-gray-600 hover:bg-gray-50 hover:text-blue-600"} onClick={toggleMenu}>Contact</NavLink>
-            
-            <div className="border-t mt-2 pt-2">
-              <div className="px-3 py-2 text-gray-600 font-medium">Dashboards</div>
-              <NavLink to="/patient-dashboard" className={({isActive}) => isActive ? "block px-3 py-2 pl-6 rounded-md text-blue-600 font-medium" : "block px-3 py-2 pl-6 rounded-md text-gray-600 hover:bg-gray-50 hover:text-blue-600"} onClick={toggleMenu}>Patient Dashboard</NavLink>
-              <NavLink to="/admin-dashboard" className={({isActive}) => isActive ? "block px-3 py-2 pl-6 rounded-md text-blue-600 font-medium" : "block px-3 py-2 pl-6 rounded-md text-gray-600 hover:bg-gray-50 hover:text-blue-600"} onClick={toggleMenu}>Admin Dashboard</NavLink>
-              <NavLink to="/analytics" className={({isActive}) => isActive ? "block px-3 py-2 pl-6 rounded-md text-blue-600 font-medium" : "block px-3 py-2 pl-6 rounded-md text-gray-600 hover:bg-gray-50 hover:text-blue-600"} onClick={toggleMenu}>Analytics</NavLink>
-              <NavLink to="/treatment-generator" className={({isActive}) => isActive ? "block px-3 py-2 pl-6 rounded-md text-blue-600 font-medium" : "block px-3 py-2 pl-6 rounded-md text-gray-600 hover:bg-gray-50 hover:text-blue-600"} onClick={toggleMenu}>Treatment Generator</NavLink>
-            </div>
-          </div>
+
+        {/* User Profile Dropdown */}
+        <div className="hidden md:flex items-center">
+          {isAuthenticated && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Avatar>
+                    <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email} />
+                    <AvatarFallback className="bg-blue-100 text-blue-600">
+                      {userInitials}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {user?.user_metadata?.full_name || user?.email?.split('@')[0]}
+                    </p>
+                    <p className="text-xs leading-none text-gray-500">
+                      {user?.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="w-full cursor-pointer flex items-center">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/settings" className="w-full cursor-pointer flex items-center">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer flex items-center">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
-      )}
-    </nav>
+
+        {/* Mobile menu button */}
+        <MobileNavToggle
+          isOpen={isMobileMenuOpen}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="md:hidden"
+        />
+      </NavBody>
+
+      {/* Mobile Navigation */}
+      {/*<MobileNav>
+        <div className={cn(
+          'space-y-1 px-2 pb-3 pt-2 transition-all duration-300',
+          isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
+        )}>
+          {isMobileMenuOpen && (
+            <>
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.link}
+                  className={cn(
+                    'block rounded-md px-3 py-2 text-base font-medium',
+                    location.pathname === item.link
+                      ? 'bg-blue-50 text-blue-700'
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                  )}
+                  onClick={closeMobileMenu}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </>
+          )}
+        </div>
+      </MobileNav>*/}
+    </ResizableNavbar>
   );
 };
 
 export default Navbar;
- 
